@@ -1,0 +1,105 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-8.6110, 41.1415]
+      },
+      "properties": {
+        "name": "Igreja de São Francisco (Iglesia de San Francisco)"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-8.6119, 41.1410]
+      },
+      "properties": {
+        "name": "Palácio da Bolsa (Palacio de la Bolsa)"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-8.6117, 41.1401]
+      },
+      "properties": {
+        "name": "Mercado do Bolhão (Mercado de Bolhão)"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-8.6093, 41.1496]
+      },
+      "properties": {
+        "name": "Torre dos Clérigos (Torre de los Clérigos)"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-8.6119, 41.1424]
+      },
+      "properties": {
+        "name": "Ribeira (Barrio de Ribeira)"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-8.6115, 41.1419]
+      },
+      "properties": {
+        "name": "Ponte Luís I (Puente Luís I)"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-8.6110, 41.1575]
+      },
+      "properties": {
+        "name": "Café Majestic (Café Majestic)"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-8.6116, 41.1481]
+      },
+      "properties": {
+        "name": "Jardins do Palácio de Cristal (Jardines del Palacio de Cristal)"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-8.6127, 41.1408]
+      },
+      "properties": {
+        "name": "Livraria Lello (Librería Lello)"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-8.6158, 41.1572]
+      },
+      "properties": {
+        "name": "Estádio do Dragão (Estadio do Dragão)"
+      }
+    }
+  ]
+}

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Mapa Interactivo Sencillo</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <style>
+    #map { height: 400px; margin-top:20px; }
+    .form-container { margin-top: 20px; padding: 10px; border: 1px solid #ccc; }
+    .form-container h3 { margin-top: 0; }
+  </style>
+</head>
+<body>
+  <h2>Añadir nuevo punto de interés</h2>
+  <form id="nuevo-form">
+    <input type="text" id="nuevo-name" placeholder="Nombre" required>
+    <input type="number" id="nuevo-lat" placeholder="Latitud" step="any" required>
+    <input type="number" id="nuevo-lng" placeholder="Longitud" step="any" required>
+    <button type="submit">Añadir</button>
+  </form>
+
+  <div id="map"></div>
+
+  <!-- Formulario de edición/ eliminación, se mostrará cuando se seleccione un punto -->
+  <div class="form-container" id="edit-container" style="display: none;">
+    <h3>Editar punto</h3>
+    <form id="edit-form">
+      <input type="hidden" id="edit-id">
+      <input type="text" id="edit-name" placeholder="Nombre" required>
+      <input type="number" id="edit-lat" placeholder="Latitud" step="any" required>
+      <input type="number" id="edit-lng" placeholder="Longitud" step="any" required>
+      <button type="submit">Guardar cambios</button>
+      <button type="button" id="delete-btn" style="margin-left: 10px;">Borrar</button>
+    </form>
+  </div>
+
+  <script>
+    // Inicializamos el mapa centrado en Oporto
+    const map = L.map('map').setView([41.1415, -8.6110], 14);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    let puntosLayer;
+
+    // Función para cargar los puntos desde el servidor
+    function cargarPuntos() {
+      fetch('/mapas/api/lugares')
+        .then(res => res.json())
+        .then(geojson => {
+          // Elimina la capa anterior si existe
+          if (puntosLayer) { map.removeLayer(puntosLayer); }
+          // Añade la nueva capa de puntos
+          puntosLayer = L.geoJSON(geojson, {
+            onEachFeature: function(feature, layer) {
+              // Al hacer clic, actualiza el formulario de edición con los datos del punto
+              layer.on('click', () => {
+                document.getElementById('edit-container').style.display = 'block';
+                document.getElementById('edit-id').value = feature.id;
+                document.getElementById('edit-name').value = feature.properties.name;
+                document.getElementById('edit-lat').value = feature.geometry.coordinates[1];
+                document.getElementById('edit-lng').value = feature.geometry.coordinates[0];
+              });
+              // Muestra el nombre en el marcador
+              layer.bindTooltip(feature.properties.name, { permanent: false, direction: 'top' });
+            }
+          }).addTo(map);
+        })
+        .catch(err => console.error("Error al cargar puntos:", err));
+    }
+
+    cargarPuntos();
+
+    // Formulario para añadir nuevos puntos
+    document.getElementById('nuevo-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const name = document.getElementById('nuevo-name').value;
+      const lat = document.getElementById('nuevo-lat').value;
+      const lng = document.getElementById('nuevo-lng').value;
+      fetch('/mapas/api/lugares', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, lat, lng })
+      })
+      .then(res => {
+        if (!res.ok) throw new Error("Error al añadir punto");
+        return res.json();
+      })
+      .then(() => {
+        cargarPuntos();
+        document.getElementById('nuevo-form').reset();
+      })
+      .catch(err => console.error(err));
+    });
+
+    // Formulario para editar un punto
+    document.getElementById('edit-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const id = document.getElementById('edit-id').value;
+      const name = document.getElementById('edit-name').value;
+      const lat = document.getElementById('edit-lat').value;
+      const lng = document.getElementById('edit-lng').value;
+      fetch(`/mapas/api/lugares/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, lat, lng })
+      })
+      .then(res => {
+        if (!res.ok) throw new Error("Error al editar el punto");
+        return res.json();
+      })
+      .then(() => {
+        cargarPuntos();
+        // Oculta el formulario de edición tras guardar
+        document.getElementById('edit-container').style.display = 'none';
+      })
+      .catch(err => console.error(err));
+    });
+
+    // Botón para borrar el punto
+    document.getElementById('delete-btn').addEventListener('click', function() {
+      const id = document.getElementById('edit-id').value;
+      fetch(`/mapas/api/lugares/${id}`, {
+        method: 'DELETE'
+      })
+      .then(res => {
+        if (!res.ok) throw new Error("Error al borrar el punto");
+        return res.json();
+      })
+      .then(() => {
+        cargarPuntos();
+        document.getElementById('edit-container').style.display = 'none';
+      })
+      .catch(err => console.error(err));
+    });
+  </script>
+</body>
+</html>
