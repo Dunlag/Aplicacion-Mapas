@@ -8,7 +8,8 @@
         "coordinates": [-8.6110, 41.1415]
       },
       "properties": {
-        "name": "Igreja de São Francisco (Iglesia de San Francisco)"
+        "name": "Igreja de São Francisco (Iglesia de San Francisco)",
+        "categoria": "Histórico"
       }
     },
     {
@@ -18,7 +19,8 @@
         "coordinates": [-8.6119, 41.1410]
       },
       "properties": {
-        "name": "Palácio da Bolsa (Palacio de la Bolsa)"
+        "name": "Palácio da Bolsa (Palacio de la Bolsa)",
+        "categoria": "Histórico"
       }
     },
     {
@@ -28,7 +30,8 @@
         "coordinates": [-8.6117, 41.1401]
       },
       "properties": {
-        "name": "Mercado do Bolhão (Mercado de Bolhão)"
+        "name": "Mercado do Bolhão (Mercado de Bolhão)",
+        "categoria": "Cultural"
       }
     },
     {
@@ -38,7 +41,8 @@
         "coordinates": [-8.6093, 41.1496]
       },
       "properties": {
-        "name": "Torre dos Clérigos (Torre de los Clérigos)"
+        "name": "Torre dos Clérigos (Torre de los Clérigos)",
+        "categoria": "Histórico"
       }
     },
     {
@@ -48,7 +52,8 @@
         "coordinates": [-8.6119, 41.1424]
       },
       "properties": {
-        "name": "Ribeira (Barrio de Ribeira)"
+        "name": "Ribeira (Barrio de Ribeira)",
+        "categoria": "Cultural"
       }
     },
     {
@@ -58,7 +63,8 @@
         "coordinates": [-8.6115, 41.1419]
       },
       "properties": {
-        "name": "Ponte Luís I (Puente Luís I)"
+        "name": "Ponte Luís I (Puente Luís I)",
+        "categoria": "Infraestructura"
       }
     },
     {
@@ -68,7 +74,8 @@
         "coordinates": [-8.6110, 41.1575]
       },
       "properties": {
-        "name": "Café Majestic (Café Majestic)"
+        "name": "Café Majestic (Café Majestic)",
+        "categoria": "Gastronómico"
       }
     },
     {
@@ -78,7 +85,8 @@
         "coordinates": [-8.6116, 41.1481]
       },
       "properties": {
-        "name": "Jardins do Palácio de Cristal (Jardines del Palacio de Cristal)"
+        "name": "Jardins do Palácio de Cristal (Jardines del Palacio de Cristal)",
+        "categoria": "Recreativo"
       }
     },
     {
@@ -88,7 +96,8 @@
         "coordinates": [-8.6127, 41.1408]
       },
       "properties": {
-        "name": "Livraria Lello (Librería Lello)"
+        "name": "Livraria Lello (Librería Lello)",
+        "categoria": "Cultural"
       }
     },
     {
@@ -98,7 +107,8 @@
         "coordinates": [-8.6158, 41.1572]
       },
       "properties": {
-        "name": "Estádio do Dragão (Estadio do Dragão)"
+        "name": "Estádio do Dragão (Estadio del Dragão)",
+        "categoria": "Deportivo"
       }
     }
   ]

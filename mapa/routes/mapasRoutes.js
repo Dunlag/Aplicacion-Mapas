@@ -39,14 +39,16 @@ router.get('/api/lugares', (req, res) => {
 
 // Endpoint para añadir un nuevo punto
 router.post('/api/lugares', (req, res) => {
-  const { name, lat, lng } = req.body;
-  if (!name || !lat || !lng) {
-    return res.status(400).json({ error: "Faltan datos (name, lat, lng)" });
+  const { name, cat, lat, lng } = req.body;
+  if (!name || !lat || !lng || !cat) {
+    return res.status(400).json({ error: "Faltan datos (name,cat, lat, lng)" });
   }
   const nuevoPunto = {
     id: Date.now(), // identificador único
     type: "Feature",
-    properties: { name },
+    properties: { name,
+      categoria: cat
+     },
     geometry: {
       type: "Point",
       coordinates: [parseFloat(lng), parseFloat(lat)]
@@ -59,17 +61,22 @@ router.post('/api/lugares', (req, res) => {
 // Endpoint para editar un punto
 router.put('/api/lugares/:id', (req, res) => {
   const id = parseInt(req.params.id);
-  const { name, lat, lng } = req.body;
+  const { name, cat, lat, lng } = req.body;
   const index = lugares.findIndex(lugar => lugar.id === id);
   if (index === -1) {
     return res.status(404).json({ error: "Punto no encontrado" });
   }
+  // Actualiza los campos, incluyendo la categoría
   lugares[index].properties.name = name || lugares[index].properties.name;
+  if (cat) {
+    lugares[index].properties.categoria = cat;
+  }
   if (lat && lng) {
     lugares[index].geometry.coordinates = [parseFloat(lng), parseFloat(lat)];
   }
   res.json(lugares[index]);
 });
+
 
 // Endpoint para borrar un punto
 router.delete('/api/lugares/:id', (req, res) => {
