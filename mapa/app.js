@@ -9,6 +9,9 @@ var usersRouter = require('./routes/users');
 var mapasRouter = require('./routes/mapasRoutes');
 var app = express();
 
+app.use(express.static(path.join(__dirname, 'node_modules/bootstrap/dist')));
+app.use(express.static(path.join(__dirname, 'node_modules/@popperjs/core/dist')))
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');

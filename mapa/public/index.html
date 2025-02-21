@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <title>Mapa Interactivo Sencillo</title>
+  <link rel="stylesheet" href="/css/bootstrap.css">
+
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <style>
@@ -18,7 +20,7 @@
     <input type="number" id="nuevo-lat" placeholder="Latitud" step="any" required>
     <input type="number" id="nuevo-lng" placeholder="Longitud" step="any" required>
     <input type="text" id="nuevo-cat" placeholder="Categoria" step="any" required>
-    <button type="submit">Añadir</button>
+    <button type="submit" class="btn btn-primary">Añadir</button>
   </form>
 
   <div id="map"></div>
@@ -37,6 +39,9 @@
     </form>
   </div>
 
+
+  <script src="/js/bootstrap.js"></script>
+  <script src="/umd/popper.min.js"></script>
   <script>
     // Inicializamos el mapa centrado en Oporto
     const map = L.map('map').setView([41.1415, -8.6110], 14);
