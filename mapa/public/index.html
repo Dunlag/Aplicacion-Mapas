@@ -1,80 +1,131 @@
 <!DOCTYPE html>
 <html>
-
 <head>
   <meta charset="UTF-8">
   <title>Mapa Interactivo Sencillo</title>
   <link rel="stylesheet" href="/css/bootstrap.css">
-
+  <link rel="stylesheet" href="/bootstrap-icons.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <style>
     #map {
-      height: 400px;
-      margin-top: 20px;
+      height: 70vh;
+      transition: all 0.3s ease; /* Añadir transición para el cambio de tamaño */
+    }
+    #btn-mode {
+      transition: opacity 1s ease; /* Agregar animación de opacidad */
     }
 
-    .form-container {
-      margin-top: 20px;
-      padding: 10px;
-      border: 1px solid #ccc;
+    #btn-mode.sun, #btn-mode.moon {
+      opacity: 0; /* Iniciar iconos con opacidad 0 */
+      visibility: hidden; /* Mantener el icono invisible al principio */
     }
 
-    .form-container h3 {
-      margin-top: 0;
+    #btn-mode.sun.show, #btn-mode.moon.show {
+      opacity: 1; /* Hacer visible el icono al momento de activarse */
+      visibility: visible; /* Cambiar visibilidad */
+    }
+
+    .leaflet-container {
+      transition: background-color 0.3s ease; /* Agregar transición al mapa */
     }
   </style>
 </head>
 
-<body>
-  <h2>Añadir nuevo punto de interés</h2>
-  <form id="nuevo-form">
-    <input type="text" id="nuevo-name" placeholder="Nombre" required>
-    <input type="number" id="nuevo-lat" placeholder="Latitud" step="any" required>
-    <input type="number" id="nuevo-lng" placeholder="Longitud" step="any" required>
-    <input type="text" id="nuevo-cat" placeholder="Categoria" step="any" required>
-    <button type="submit" class="btn btn-primary">Añadir</button>
-  </form>
+<body class="" data-bs-theme="light">
+  <nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container">
+      <a class="navbar-brand" href="#"><i class="bi bi-rocket-takeoff fs-1" id="cohete"></i></a>
+      <h1 class="">Bienvenido a tu gestor de puntos de interés</h1>
+      <form class="d-flex" role="search">
+        <input class="form-control me-2" type="search" placeholder="Categoria" aria-label="Search">
+        <button class="btn btn-outline-success" type="submit">Buscar</button>
+      </form>
+      <button id="toggle-theme" class="btn btn-light btn-outline-dark">
+        <i id="btn-mode" class="bi bi-emoji-sunglasses-fill sun show"></i> <!-- Sol visible al inicio -->
+        <i id="btn-mode" class="bi bi-moon-stars-fill moon"></i> <!-- Luna inicialmente oculta -->
+      </button>
+    </div>
+  </nav>
 
-  <div id="map" style="height: 70vh;"></div>
+  <main class="container mt-5">
+    <div class="card bg-opacity-75 rounded p-3">
+      <h4>Añadir nuevo punto de interés</h4>
+      <form id="nuevo-form" class="row g-2 align-items-center">
+        <div class="col-auto">
+          <input type="text" id="nuevo-name" class="form-control" placeholder="Nombre" required>
+        </div>
+        <div class="col-auto">
+          <input type="number" id="nuevo-lat" class="form-control" placeholder="Latitud" step="any" required>
+        </div>
+        <div class="col-auto">
+          <input type="number" id="nuevo-lng" class="form-control" placeholder="Longitud" step="any" required>
+        </div>
+        <div class="col-auto">
+          <input type="text" id="nuevo-cat" class="form-control" placeholder="Categoría" required>
+        </div>
+        <div class="col-auto">
+          <button type="submit" class="btn btn-primary shadow">
+            <i class="bi bi-cursor-fill"></i> Añadir
+          </button>
+        </div>
+      </form>
+    </div>
 
-  <!-- Formulario de edición/ eliminación, se mostrará cuando se seleccione un punto -->
-  <div class="form-container" id="edit-container" style="display: none;">
-    <h3>Info punto</h3>
-    <form id="edit-form">
-      <input type="hidden" id="edit-id">
-      <input type="text" id="edit-name" placeholder="Nombre" required>
-      <input type="number" id="edit-lat" placeholder="Latitud" step="any" required>
-      <input type="number" id="edit-lng" placeholder="Longitud" step="any" required>
-      <input type="text" id="edit-cat" placeholder="Categoria" step="any" required>
-      <button type="submit">Guardar cambios</button>
-      <button type="button" id="delete-btn" style="margin-left: 10px;">Borrar</button>
-    </form>
-  </div>
+    <section class="d-flex">
+      <div id="map" class="col-12"></div>
 
+      <div class="form-container ms-3 mt-5" id="edit-container" style="display: none;">
+        <h4>Info punto</h4>
+        <form id="edit-form" class="col">
+          <input type="hidden" id="edit-id">
+          <div class="mb-3">
+            <label for="edit-name" class="form-label">Nombre:</label>
+            <input type="text" id="edit-name" class="form-control" placeholder="Nombre" required>
+          </div>
+          <div class="mb-3">
+            <label for="edit-name" class="form-label">Altitud:</label>
+            <input type="number" id="edit-lat" class="form-control" placeholder="Latitud" step="any" required>
+          </div>
+          <label for="edit-name" class="form-label">Longuitud:</label>
+          <input type="number" id="edit-lng" class="form-control" placeholder="Longitud" step="any" required>
+          <div class="mb-3">
+            <label for="edit-name" class="form-label">Categoria:</label>
+            <input type="text" id="edit-cat" class="form-control" placeholder="Categoria" step="any" required><br>
+          </div>
+          <div class="btn-group mt-3" role="group">
+            <button type="submit" class="btn btn-primary btn-outline-light btn-lg shadow rounded">
+              <i class="bi bi-cloud-download"></i> Guardar
+            </button>
+            <button type="button" id="delete-btn" class="btn btn-dark btn-outline-light btn-lg shadow rounded">
+              <i class="bi bi-trash"></i> Borrar
+            </button>
+            <button type="button" id="close-btn" class="btn btn-success btn-outline-light btn-lg shadow rounded">
+              <i class="bi bi-door-closed"></i> Cerrar
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
 
   <script src="/js/bootstrap.js"></script>
   <script src="/umd/popper.min.js"></script>
   <script>
-    // Inicializamos el mapa centrado en Oporto
     const map = L.map('map').setView([41.1415, -8.6110], 14);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors'
-    }).addTo(map);
+    let currentTileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© OpenStreetMap contributors'
+}).addTo(map); // Capa por defecto, modo claro
 
     let puntosLayer;
 
-    // Función para cargar los puntos desde el servidor
     function cargarPuntos() {
       fetch('/mapas/api/lugares')
         .then(res => res.json())
         .then(geojson => {
-          // Elimina la capa anterior si existe
           if (puntosLayer) { map.removeLayer(puntosLayer); }
-          // Añade la nueva capa de puntos
           puntosLayer = L.geoJSON(geojson, {
             onEachFeature: function (feature, layer) {
-              // Al hacer clic, actualiza el formulario de edición con los datos del punto
               layer.on('click', () => {
                 document.getElementById('edit-container').style.display = 'block';
                 document.getElementById('edit-id').value = feature.id;
@@ -82,8 +133,11 @@
                 document.getElementById('edit-cat').value = feature.properties.categoria;
                 document.getElementById('edit-lat').value = feature.geometry.coordinates[1];
                 document.getElementById('edit-lng').value = feature.geometry.coordinates[0];
+                
+                // Cambiar tamaño del mapa cuando se haga clic en un punto
+                document.getElementById('map').classList.remove('col-12');
+                document.getElementById('map').classList.add('col-8');
               });
-              // Muestra el nombre en el marcador
               layer.bindTooltip(feature.properties.name, { permanent: false, direction: 'top' });
             }
           }).addTo(map);
@@ -93,7 +147,6 @@
 
     cargarPuntos();
 
-    // Formulario para añadir nuevos puntos
     document.getElementById('nuevo-form').addEventListener('submit', function (e) {
       e.preventDefault();
       const name = document.getElementById('nuevo-name').value;
@@ -116,8 +169,6 @@
         .catch(err => console.error(err));
     });
 
-    // Formulario para editar un punto
-
     document.getElementById('edit-form').addEventListener('submit', function (e) {
       e.preventDefault();
       const id = document.getElementById('edit-id').value;
@@ -125,6 +176,7 @@
       const cat = document.getElementById('edit-cat').value;
       const lat = document.getElementById('edit-lat').value;
       const lng = document.getElementById('edit-lng').value;
+
       fetch(`/mapas/api/lugares/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -136,40 +188,72 @@
         })
         .then(() => {
           cargarPuntos();
-          // Oculta el formulario de edición tras guardar
           document.getElementById('edit-container').style.display = 'none';
+          // Restaurar tamaño del mapa al cerrar el formulario
+          document.getElementById('map').classList.remove('col-8');
+          document.getElementById('map').classList.add('col-12');
         })
         .catch(err => console.error(err));
     });
 
-
-
     const confBorrar = document.getElementById('delete-btn');
+    confBorrar.addEventListener('click', function () {
+      const confirmacion = confirm('Vas a borrar el elemento, ¿estás seguro?');
 
-// Confirmar antes de borrar
-confBorrar.addEventListener('click', function () {
-  const confirmacion = confirm('Vas a borrar el elemento, ¿estás seguro?');
-  
-  if (confirmacion) {
-    // Obtener el ID del elemento a borrar
-    const id = document.getElementById('edit-id').value;
-    
-    fetch(`/mapas/api/lugares/${id}`, {
-      method: 'DELETE'
-    })
-      .then(res => {
-        if (!res.ok) throw new Error("Error al borrar el punto");
-        return res.json();
-      })
-      .then(() => {
-        cargarPuntos(); // Recargar los puntos en el mapa
-        document.getElementById('edit-container').style.display = 'none'; // Ocultar el contenedor de edición
-      })
-      .catch(err => console.error(err));
-  }
-});
+      if (confirmacion) {
+        const id = document.getElementById('edit-id').value;
 
+        fetch(`/mapas/api/lugares/${id}`, {
+          method: 'DELETE'
+        })
+          .then(res => {
+            if (!res.ok) throw new Error("Error al borrar el punto");
+            return res.json();
+          })
+          .then(() => {
+            cargarPuntos();
+            document.getElementById('edit-container').style.display = 'none';
+            document.getElementById('map').classList.remove('col-8');
+            document.getElementById('map').classList.add('col-12');
+          })
+          .catch(err => console.error(err));
+      }
+    });
+
+    const botonCerrar = document.getElementById('close-btn');
+    botonCerrar.addEventListener('click', function () {
+      document.getElementById('edit-container').style.display = 'none';
+      document.getElementById('map').classList.remove('col-8');
+      document.getElementById('map').classList.add('col-12');
+    });
+
+    // Función de cambio de tema para el mapa
+    const toggleButton = document.getElementById('toggle-theme');
+    const sunIcon = document.querySelector('.sun');
+    const moonIcon = document.querySelector('.moon');
+    const body = document.body;
+
+    toggleButton.addEventListener('click', function () {
+      if (body.getAttribute('data-bs-theme') === 'light') {
+        body.setAttribute('data-bs-theme', 'dark');
+        sunIcon.classList.remove('show');  // Ocultar sol
+        moonIcon.classList.add('show');  // Mostrar luna
+        // Cambiar la capa de mapa a oscuro
+        map.removeLayer(currentTileLayer);
+        currentTileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png', {
+          attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+      } else {
+        body.setAttribute('data-bs-theme', 'light');
+        moonIcon.classList.remove('show');  // Ocultar luna
+        sunIcon.classList.add('show');  // Mostrar sol
+        // Cambiar la capa de mapa a claro
+        map.removeLayer(currentTileLayer);
+        currentTileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors, © CartoDB'
+    }).addTo(map);
+      }
+    });
   </script>
 </body>
-
 </html>

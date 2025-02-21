@@ -11,6 +11,7 @@ var app = express();
 
 app.use(express.static(path.join(__dirname, 'node_modules/bootstrap/dist')));
 app.use(express.static(path.join(__dirname, 'node_modules/@popperjs/core/dist')))
+app.use(express.static(path.join(__dirname, 'node_modules/bootstrap-icons/font')));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
