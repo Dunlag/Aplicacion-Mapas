@@ -5,7 +5,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [-8.6110, 41.1415]
+        "coordinates": [-8.611, 41.1415]
       },
       "properties": {
         "name": "Igreja de São Francisco (Iglesia de San Francisco)",
@@ -16,7 +16,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [-8.6119, 41.1410]
+        "coordinates": [-8.6119, 41.141]
       },
       "properties": {
         "name": "Palácio da Bolsa (Palacio de la Bolsa)",
@@ -71,7 +71,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [-8.6110, 41.1575]
+        "coordinates": [-8.611, 41.1575]
       },
       "properties": {
         "name": "Café Majestic (Café Majestic)",
@@ -109,6 +109,87 @@
       "properties": {
         "name": "Estádio do Dragão (Estadio del Dragão)",
         "categoria": "Deportivo"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-3.7038, 40.4168] },
+      "properties": { "name": "Puerta del Sol", "categoria": "Histórico" }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-3.6883, 40.4192] },
+      "properties": { "name": "Parque del Retiro", "categoria": "Recreativo" }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-3.6934, 40.4113] },
+      "properties": { "name": "Museo del Prado", "categoria": "Cultural" }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-3.692, 40.422] },
+      "properties": { "name": "Gran Vía", "categoria": "Comercial" }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-3.7344, 40.4172] },
+      "properties": {
+        "name": "Estadio Santiago Bernabéu",
+        "categoria": "Deportivo"
+      }
+    },
+
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-5.5711, 42.5987] },
+      "properties": { "name": "Catedral de León", "categoria": "Religioso" }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-5.568, 42.6012] },
+      "properties": {
+        "name": "Basílica de San Isidoro",
+        "categoria": "Religioso"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-5.5705, 42.597] },
+      "properties": { "name": "Plaza Mayor", "categoria": "Histórico" }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-5.569, 42.5995] },
+      "properties": { "name": "Barrio Húmedo", "categoria": "Gastronómico" }
+    },
+
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-4.4214, 36.7213] },
+      "properties": { "name": "Catedral de Málaga", "categoria": "Religioso" }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-4.4189, 36.7196] },
+      "properties": { "name": "Alcazaba de Málaga", "categoria": "Histórico" }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-4.4233, 36.7228] },
+      "properties": { "name": "Muelle Uno", "categoria": "Comercial" }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-4.425, 36.719] },
+      "properties": { "name": "Museo Picasso Málaga", "categoria": "Cultural" }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-4.4265, 36.7205] },
+      "properties": {
+        "name": "Teatro Romano de Málaga",
+        "categoria": "Histórico"
       }
     }
   ]
