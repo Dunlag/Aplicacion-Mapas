@@ -20,21 +20,9 @@ router.post("/login", function (req, res, next) {
 
   // Leer el archivo JSON con los usuarios
   fs.readFile(
-    path.join(__dirname, "../data/users.json"),
-    "utf8",
-    function (err, data) {
-      if (err) {
-        console.error("Error al leer users.json:", err);
-        return res.status(500).send("Error interno del servidor");
-      }
+    path.join(__dirname, "../data/users.json"),"utf8", function (data) {
       let users;
-      try {
-        users = JSON.parse(data);
-      } catch (parseErr) {
-        console.error("Error al parsear users.json:", parseErr);
-        return res.status(500).send("Error interno del servidor");
-      }
-
+      users = JSON.parse(data);
       // Buscar el usuario que coincida con las credenciales
       const user = users.find(
         (u) => u.email === email && u.password === password
@@ -43,7 +31,7 @@ router.post("/login", function (req, res, next) {
         // Si las credenciales son correctas, redirige a /mapas
         return res.redirect("/mapas");
       } else {
-        // Si son incorrectas, enviar un mensaje de error
+        // Si son incorrectas, se redirige a /login
         return res.redirect("/login");
       }
     }

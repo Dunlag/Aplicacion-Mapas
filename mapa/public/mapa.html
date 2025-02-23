@@ -3,28 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <title>Mapa Interactivo Sencillo</title>
+  <link rel="stylesheet" href="./stylesheets/style.css">
   <link rel="stylesheet" href="/css/bootstrap.css">
   <link rel="stylesheet" href="/bootstrap-icons.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet">
+
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <style>
-    #map {
-      height: 60vh;
-      transition: all 0.3s ease;
-    }
-    #btn-mode {
-      transition: opacity 1s ease;
-    }
-    #btn-mode.sun, #btn-mode.moon {
-      opacity: 0;
-      visibility: hidden;
-    }
-    #btn-mode.sun.show, #btn-mode.moon.show {
-      opacity: 1.5; /* Nota: normalmente se usa un valor entre 0 y 1 */
-      visibility: visible;
-    }
-    .leaflet-container {
-      transition: background-color 0.3s ease;
+    *{
+      font-family: "Geist", serif;
     }
   </style>
 </head>
@@ -123,174 +113,10 @@
 
   <script src="/js/bootstrap.js"></script>
   <script src="/umd/popper.min.js"></script>
-  <script>
-    // Inicialización del mapa
-    const map = L.map('map').setView([41.1415, -8.6110], 14);
+  <script src="./javascripts/modoOscuro.js"></script>
+  <script src="./javascripts/iniciarMapa.js"></script>
+  <script src="./javascripts/agregarPunto.js"></script>
+  <script src="./javascripts/edicion.js"></script>
 
-    // Capa por defecto: se usa la de CartoDB Voyager para modo claro
-    let currentTileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors, © CartoDB'
-    }).addTo(map);
-
-    let puntosLayer;
-    let geojsonData = null; // Variable global para almacenar la data
-
-    // Función para cargar todos los puntos desde la API
-    function cargarPuntos() {
-      fetch('/mapas/api/lugares')
-        .then(res => res.json())
-        .then(geojson => {
-          geojsonData = geojson; // Guardamos la data
-          dibujarPuntos(geojsonData);
-        })
-        .catch(err => console.error("Error al cargar puntos:", err));
-    }
-
-    // Función para dibujar los puntos en el mapa (según filtro)
-    function dibujarPuntos(data) {
-      if (puntosLayer) {
-        map.removeLayer(puntosLayer);
-      }
-      puntosLayer = L.geoJSON(data, {
-        onEachFeature: function (feature, layer) {
-          layer.on('click', () => {
-            document.getElementById('edit-container').style.display = 'block';
-            document.getElementById('edit-id').value = feature.id;
-            document.getElementById('edit-name').value = feature.properties.name;
-            document.getElementById('edit-cat').value = feature.properties.categoria;
-            document.getElementById('edit-lat').value = feature.geometry.coordinates[1];
-            document.getElementById('edit-lng').value = feature.geometry.coordinates[0];
-            // Ajustar tamaño del mapa
-            document.getElementById('map').classList.remove('col-12');
-            document.getElementById('map').classList.add('col-8');
-          });
-          layer.bindTooltip(feature.properties.name, { permanent: false, direction: 'top' });
-        }
-      }).addTo(map);
-    }
-
-    cargarPuntos();
-
-    // Evento para el formulario de búsqueda
-    document.getElementById("search-form").addEventListener("submit", function(e) {
-      e.preventDefault(); // Prevenir envío del formulario
-      const termino = document.getElementById("search-input").value.trim().toLowerCase();
-      if (!geojsonData) return;
-
-      // Filtrar las features del GeoJSON según la categoría
-      const dataFiltrada = {
-        ...geojsonData,
-        features: geojsonData.features.filter(feature => {
-          const cat = feature.properties.categoria.toLowerCase();
-          return cat.includes(termino);
-        })
-      };
-
-      dibujarPuntos(dataFiltrada);
-    });
-
-    // Evento para el formulario de agregar nuevo punto
-    document.getElementById('nuevo-form').addEventListener('submit', function (e) {
-      e.preventDefault();
-      const name = document.getElementById('nuevo-name').value;
-      const cat = document.getElementById('nuevo-cat').value;
-      const lat = document.getElementById('nuevo-lat').value;
-      const lng = document.getElementById('nuevo-lng').value;
-      fetch('/mapas/api/lugares', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, cat, lat, lng })
-      })
-      .then(res => {
-        if (!res.ok) throw new Error("Error al añadir punto");
-        return res.json();
-      })
-      .then(() => {
-        cargarPuntos();
-        document.getElementById('nuevo-form').reset();
-      })
-      .catch(err => console.error(err));
-    });
-
-    // Eventos para editar y borrar puntos (ya implementados)
-    document.getElementById('edit-form').addEventListener('submit', function (e) {
-      e.preventDefault();
-      const id = document.getElementById('edit-id').value;
-      const name = document.getElementById('edit-name').value;
-      const cat = document.getElementById('edit-cat').value;
-      const lat = document.getElementById('edit-lat').value;
-      const lng = document.getElementById('edit-lng').value;
-      fetch(`/mapas/api/lugares/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, cat, lat, lng })
-      })
-      .then(res => {
-        if (!res.ok) throw new Error("Error al editar el punto");
-        return res.json();
-      })
-      .then(() => {
-        cargarPuntos();
-        document.getElementById('edit-container').style.display = 'none';
-        document.getElementById('map').classList.remove('col-8');
-        document.getElementById('map').classList.add('col-12');
-      })
-      .catch(err => console.error(err));
-    });
-
-    const confBorrar = document.getElementById('delete-btn');
-    confBorrar.addEventListener('click', function () {
-      const confirmacion = confirm('Vas a borrar el elemento, ¿estás seguro?');
-      if (confirmacion) {
-        const id = document.getElementById('edit-id').value;
-        fetch(`/mapas/api/lugares/${id}`, {
-          method: 'DELETE'
-        })
-        .then(res => {
-          if (!res.ok) throw new Error("Error al borrar el punto");
-          return res.json();
-        })
-        .then(() => {
-          cargarPuntos();
-          document.getElementById('edit-container').style.display = 'none';
-          document.getElementById('map').classList.remove('col-8');
-          document.getElementById('map').classList.add('col-12');
-        })
-        .catch(err => console.error(err));
-      }
-    });
-
-    const botonCerrar = document.getElementById('close-btn');
-    botonCerrar.addEventListener('click', function () {
-      document.getElementById('edit-container').style.display = 'none';
-      document.getElementById('map').classList.remove('col-8');
-      document.getElementById('map').classList.add('col-12');
-    });
-
-    // Función de cambio de tema para el mapa
-    const toggleButton = document.getElementById('toggle-theme');
-    const sunIcon = document.querySelector('.sun');
-    const moonIcon = document.querySelector('.moon');
-    const body = document.body;
-    toggleButton.addEventListener('click', function () {
-      if (body.getAttribute('data-bs-theme') === 'light') {
-        body.setAttribute('data-bs-theme', 'dark');
-        sunIcon.classList.remove('show');
-        moonIcon.classList.add('show');
-        map.removeLayer(currentTileLayer);
-        currentTileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}.png', {
-          attribution: '© OpenStreetMap contributors'
-        }).addTo(map);
-      } else {
-        body.setAttribute('data-bs-theme', 'light');
-        moonIcon.classList.remove('show');
-        sunIcon.classList.add('show');
-        map.removeLayer(currentTileLayer);
-        currentTileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png', {
-          attribution: '© OpenStreetMap contributors, © CartoDB'
-        }).addTo(map);
-      }
-    });
-  </script>
 </body>
 </html>

@@ -1,8 +1,24 @@
-body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap');
+
+body{
+  font-family: "Geist", serif;
 }
 
-a {
-  color: #00B7FF;
+#map {
+  height: 60vh;
+  transition: all 0.3s ease;
+}
+#btn-mode {
+  transition: opacity 1s ease;
+}
+#btn-mode.sun, #btn-mode.moon {
+  opacity: 0;
+  visibility: hidden;
+}
+#btn-mode.sun.show, #btn-mode.moon.show {
+  opacity: 1.5; /* Nota: normalmente se usa un valor entre 0 y 1 */
+  visibility: visible;
+}
+.leaflet-container {
+  transition: background-color 0.3s ease;
 }
