@@ -26,7 +26,7 @@ fs.readJson(dataFilePath)
 
 // Sirve la página del mapa
 router.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/index.html'));
+  res.sendFile(path.join(__dirname, '../public/mapa.html'));
 });
 
 // Endpoint para obtener todos los puntos en formato GeoJSON

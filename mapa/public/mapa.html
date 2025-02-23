@@ -10,24 +10,21 @@
   <style>
     #map {
       height: 60vh;
-      transition: all 0.3s ease; /* Añadir transición para el cambio de tamaño */
+      transition: all 0.3s ease;
     }
     #btn-mode {
-      transition: opacity 1s ease; /* Agregar animación de opacidad */
+      transition: opacity 1s ease;
     }
-
     #btn-mode.sun, #btn-mode.moon {
-      opacity: 0; /* Iniciar iconos con opacidad 0 */
-      visibility: hidden; /* Mantener el icono invisible al principio */
+      opacity: 0;
+      visibility: hidden;
     }
-
     #btn-mode.sun.show, #btn-mode.moon.show {
-      opacity: 1.5; /* Hacer visible el icono al momento de activarse */
-      visibility: visible; /* Cambiar visibilidad */
+      opacity: 1.5; /* Nota: normalmente se usa un valor entre 0 y 1 */
+      visibility: visible;
     }
-
     .leaflet-container {
-      transition: background-color 0.3s ease; /* Agregar transición al mapa */
+      transition: background-color 0.3s ease;
     }
   </style>
 </head>
@@ -37,13 +34,14 @@
     <div class="container">
       <a class="navbar-brand" href="#"><i class="bi bi-compass fs-1" id="cohete"></i></a>
       <h1 class="">Bienvenido a tu gestor de puntos de interés</h1>
-      <form class="d-flex" role="search">
-        <input class="form-control me-2" type="search" placeholder="Categoria" aria-label="Search">
+      <!-- Formulario de búsqueda de categoría -->
+      <form id="search-form" class="d-flex" role="search">
+        <input id="search-input" class="form-control me-2" type="search" placeholder="Categoría" aria-label="Search">
         <button class="btn btn-outline-success" type="submit">Buscar</button>
       </form>
       <button id="toggle-theme" class="btn btn-toolbar">
-        <i id="btn-mode" class="bi bi-emoji-sunglasses-fill sun show fs-3"></i> <!-- Sol visible al inicio -->
-        <i id="btn-mode" class="bi bi-moon-stars-fill moon fs-3"></i> <!-- Luna inicialmente oculta -->
+        <i id="btn-mode" class="bi bi-emoji-sunglasses-fill sun show fs-3"></i>
+        <i id="btn-mode" class="bi bi-moon-stars-fill moon fs-3"></i>
       </button>
     </div>
   </nav>
@@ -84,14 +82,14 @@
             <input type="text" id="edit-name" class="form-control" placeholder="Nombre" required>
           </div>
           <div class="mb-3">
-            <label for="edit-name" class="form-label">Altitud:</label>
+            <label for="edit-lat" class="form-label">Altitud:</label>
             <input type="number" id="edit-lat" class="form-control" placeholder="Latitud" step="any" required>
           </div>
-          <label for="edit-name" class="form-label">Longuitud:</label>
+          <label for="edit-lng" class="form-label">Longitud:</label>
           <input type="number" id="edit-lng" class="form-control" placeholder="Longitud" step="any" required>
           <div class="mb-3">
-            <label for="edit-name" class="form-label">Categoria:</label>
-            <input type="text" id="edit-cat" class="form-control" placeholder="Categoria" step="any" required><br>
+            <label for="edit-cat" class="form-label">Categoría:</label>
+            <input type="text" id="edit-cat" class="form-control" placeholder="Categoría" step="any" required>
           </div>
           <div class="btn-group mt-3" role="group">
             <button type="submit" class="btn btn-primary btn-outline-light btn-lg shadow rounded">
@@ -111,13 +109,11 @@
 
   <footer class="container d-flex flex-wrap justify-content-between align-items-center py-3 my-5 border-top">
     <p class="col-md-4 mb-0 text-body-secondary">&copy; 2025 Fernando Pinilla Valbuena, Inc</p>
-
     <a href="/" class="col-md-4 d-flex align-items-center justify-content-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
       <i class="bi bi-rocket-takeoff fs-1"></i>
     </a>
-
     <ul class="nav col-md-4 justify-content-end">
-      <li class="nav-item"><a href="#" class="nav-link px-2 text-body-secondary">Home</a></li>
+      <li class="nav-item"><a href="http://localhost:3000/login" class="nav-link px-2 text-body-secondary">Cerrar sesion</a></li>
       <li class="nav-item"><a href="#" class="nav-link px-2 text-body-secondary">Features</a></li>
       <li class="nav-item"><a href="#" class="nav-link px-2 text-body-secondary">Pricing</a></li>
       <li class="nav-item"><a href="#" class="nav-link px-2 text-body-secondary">FAQs</a></li>
@@ -128,41 +124,72 @@
   <script src="/js/bootstrap.js"></script>
   <script src="/umd/popper.min.js"></script>
   <script>
+    // Inicialización del mapa
     const map = L.map('map').setView([41.1415, -8.6110], 14);
+
+    // Capa por defecto: se usa la de CartoDB Voyager para modo claro
     let currentTileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png', {
-  attribution: '© OpenStreetMap contributors'
-}).addTo(map); // Capa por defecto, modo claro
+      attribution: '© OpenStreetMap contributors, © CartoDB'
+    }).addTo(map);
 
     let puntosLayer;
+    let geojsonData = null; // Variable global para almacenar la data
 
+    // Función para cargar todos los puntos desde la API
     function cargarPuntos() {
       fetch('/mapas/api/lugares')
         .then(res => res.json())
         .then(geojson => {
-          if (puntosLayer) { map.removeLayer(puntosLayer); }
-          puntosLayer = L.geoJSON(geojson, {
-            onEachFeature: function (feature, layer) {
-              layer.on('click', () => {
-                document.getElementById('edit-container').style.display = 'block';
-                document.getElementById('edit-id').value = feature.id;
-                document.getElementById('edit-name').value = feature.properties.name;
-                document.getElementById('edit-cat').value = feature.properties.categoria;
-                document.getElementById('edit-lat').value = feature.geometry.coordinates[1];
-                document.getElementById('edit-lng').value = feature.geometry.coordinates[0];
-                
-                // Cambiar tamaño del mapa cuando se haga clic en un punto
-                document.getElementById('map').classList.remove('col-12');
-                document.getElementById('map').classList.add('col-8');
-              });
-              layer.bindTooltip(feature.properties.name, { permanent: false, direction: 'top' });
-            }
-          }).addTo(map);
+          geojsonData = geojson; // Guardamos la data
+          dibujarPuntos(geojsonData);
         })
         .catch(err => console.error("Error al cargar puntos:", err));
     }
 
+    // Función para dibujar los puntos en el mapa (según filtro)
+    function dibujarPuntos(data) {
+      if (puntosLayer) {
+        map.removeLayer(puntosLayer);
+      }
+      puntosLayer = L.geoJSON(data, {
+        onEachFeature: function (feature, layer) {
+          layer.on('click', () => {
+            document.getElementById('edit-container').style.display = 'block';
+            document.getElementById('edit-id').value = feature.id;
+            document.getElementById('edit-name').value = feature.properties.name;
+            document.getElementById('edit-cat').value = feature.properties.categoria;
+            document.getElementById('edit-lat').value = feature.geometry.coordinates[1];
+            document.getElementById('edit-lng').value = feature.geometry.coordinates[0];
+            // Ajustar tamaño del mapa
+            document.getElementById('map').classList.remove('col-12');
+            document.getElementById('map').classList.add('col-8');
+          });
+          layer.bindTooltip(feature.properties.name, { permanent: false, direction: 'top' });
+        }
+      }).addTo(map);
+    }
+
     cargarPuntos();
 
+    // Evento para el formulario de búsqueda
+    document.getElementById("search-form").addEventListener("submit", function(e) {
+      e.preventDefault(); // Prevenir envío del formulario
+      const termino = document.getElementById("search-input").value.trim().toLowerCase();
+      if (!geojsonData) return;
+
+      // Filtrar las features del GeoJSON según la categoría
+      const dataFiltrada = {
+        ...geojsonData,
+        features: geojsonData.features.filter(feature => {
+          const cat = feature.properties.categoria.toLowerCase();
+          return cat.includes(termino);
+        })
+      };
+
+      dibujarPuntos(dataFiltrada);
+    });
+
+    // Evento para el formulario de agregar nuevo punto
     document.getElementById('nuevo-form').addEventListener('submit', function (e) {
       e.preventDefault();
       const name = document.getElementById('nuevo-name').value;
@@ -174,17 +201,18 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, cat, lat, lng })
       })
-        .then(res => {
-          if (!res.ok) throw new Error("Error al añadir punto");
-          return res.json();
-        })
-        .then(() => {
-          cargarPuntos();
-          document.getElementById('nuevo-form').reset();
-        })
-        .catch(err => console.error(err));
+      .then(res => {
+        if (!res.ok) throw new Error("Error al añadir punto");
+        return res.json();
+      })
+      .then(() => {
+        cargarPuntos();
+        document.getElementById('nuevo-form').reset();
+      })
+      .catch(err => console.error(err));
     });
 
+    // Eventos para editar y borrar puntos (ya implementados)
     document.getElementById('edit-form').addEventListener('submit', function (e) {
       e.preventDefault();
       const id = document.getElementById('edit-id').value;
@@ -192,47 +220,43 @@
       const cat = document.getElementById('edit-cat').value;
       const lat = document.getElementById('edit-lat').value;
       const lng = document.getElementById('edit-lng').value;
-
       fetch(`/mapas/api/lugares/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, cat, lat, lng })
       })
-        .then(res => {
-          if (!res.ok) throw new Error("Error al editar el punto");
-          return res.json();
-        })
-        .then(() => {
-          cargarPuntos();
-          document.getElementById('edit-container').style.display = 'none';
-          // Restaurar tamaño del mapa al cerrar el formulario
-          document.getElementById('map').classList.remove('col-8');
-          document.getElementById('map').classList.add('col-12');
-        })
-        .catch(err => console.error(err));
+      .then(res => {
+        if (!res.ok) throw new Error("Error al editar el punto");
+        return res.json();
+      })
+      .then(() => {
+        cargarPuntos();
+        document.getElementById('edit-container').style.display = 'none';
+        document.getElementById('map').classList.remove('col-8');
+        document.getElementById('map').classList.add('col-12');
+      })
+      .catch(err => console.error(err));
     });
 
     const confBorrar = document.getElementById('delete-btn');
     confBorrar.addEventListener('click', function () {
       const confirmacion = confirm('Vas a borrar el elemento, ¿estás seguro?');
-
       if (confirmacion) {
         const id = document.getElementById('edit-id').value;
-
         fetch(`/mapas/api/lugares/${id}`, {
           method: 'DELETE'
         })
-          .then(res => {
-            if (!res.ok) throw new Error("Error al borrar el punto");
-            return res.json();
-          })
-          .then(() => {
-            cargarPuntos();
-            document.getElementById('edit-container').style.display = 'none';
-            document.getElementById('map').classList.remove('col-8');
-            document.getElementById('map').classList.add('col-12');
-          })
-          .catch(err => console.error(err));
+        .then(res => {
+          if (!res.ok) throw new Error("Error al borrar el punto");
+          return res.json();
+        })
+        .then(() => {
+          cargarPuntos();
+          document.getElementById('edit-container').style.display = 'none';
+          document.getElementById('map').classList.remove('col-8');
+          document.getElementById('map').classList.add('col-12');
+        })
+        .catch(err => console.error(err));
       }
     });
 
@@ -248,26 +272,23 @@
     const sunIcon = document.querySelector('.sun');
     const moonIcon = document.querySelector('.moon');
     const body = document.body;
-
     toggleButton.addEventListener('click', function () {
       if (body.getAttribute('data-bs-theme') === 'light') {
         body.setAttribute('data-bs-theme', 'dark');
-        sunIcon.classList.remove('show');  // Ocultar sol
-        moonIcon.classList.add('show');  // Mostrar luna
-        // Cambiar la capa de mapa a oscuro
+        sunIcon.classList.remove('show');
+        moonIcon.classList.add('show');
         map.removeLayer(currentTileLayer);
         currentTileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}.png', {
           attribution: '© OpenStreetMap contributors'
         }).addTo(map);
       } else {
         body.setAttribute('data-bs-theme', 'light');
-        moonIcon.classList.remove('show');  // Ocultar luna
-        sunIcon.classList.add('show');  // Mostrar sol
-        // Cambiar la capa de mapa a claro
+        moonIcon.classList.remove('show');
+        sunIcon.classList.add('show');
         map.removeLayer(currentTileLayer);
         currentTileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors, © CartoDB'
-    }).addTo(map);
+          attribution: '© OpenStreetMap contributors, © CartoDB'
+        }).addTo(map);
       }
     });
   </script>
